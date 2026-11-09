@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<style>body{margin:0}img{max-width:100%}</style>
+</head>
+<body>
+<title>La Bolsita del Intercambio</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Caveat:wght@600;700&family=Nunito:wght@400;600;800&display=swap">
+<style>
+/* Layout: one centered column; screen 1 = the drawstring pouch that opens and releases the five cards, screen 2 = a beach stage with the drawn person dancing hula. */
+:root {
+  --bg: #EAF1EC;
+  --surface: #FFFFFF;
+  --ink: #2B2233;
+  --muted: #6A6172;
+  --accent: #D93D5B;
+  --accent-ink: #FFFFFF;
+  --sack: #C24E3C;
+  --sack-dark: #8F3328;
+  --string: #F2C14E;
+  --line: #D3DDD6;
+  --font-display: "Bagel Fat One", "Arial Rounded MT Bold", "Trebuchet MS", sans-serif;
+  --font-body: "Nunito", "Segoe UI", system-ui, sans-serif;
+  --font-hand: "Caveat", "Segoe Print", "Comic Sans MS", cursive;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1C1824; --surface: #29232F; --ink: #F3ECE7; --muted: #B3A9B8;
+    --accent: #FF6E86; --accent-ink: #1C1824; --sack: #C9584A; --sack-dark: #8A3429;
+    --string: #F2C14E; --line: #3B3442;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1C1824; --surface: #29232F; --ink: #F3ECE7; --muted: #B3A9B8;
+  --accent: #FF6E86; --accent-ink: #1C1824; --sack: #C9584A; --sack-dark: #8A3429;
+  --string: #F2C14E; --line: #3B3442;
+  color-scheme: dark;
+}
+[hidden] { display: none !important; }
+html, body { min-height: 100%; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 40px;
+}
+.wrap { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; align-items: center; text-align: center; }
+.eyebrow { font-size: 13px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0; }
+h1 { font-family: var(--font-display); font-weight: 400; font-size: clamp(38px, 9vw, 60px); line-height: 1; margin: 6px 0 0; color: var(--accent); text-wrap: balance; }
+h2 { font-family: var(--font-display); font-weight: 400; font-size: clamp(24px, 6vw, 34px); line-height: 1.1; margin: 0; text-wrap: balance; min-height: 1.1em; }
+h2.pop { animation: pop .45s ease-out; }
+.lead { margin: 0; max-width: 52ch; color: var(--muted); }
+.lead strong { color: var(--ink); }
+
+.stage { width: 240px; max-width: 100%; border-radius: 24px; }
+.stage.tap { cursor: pointer; animation: nudge 1.6s ease-in-out infinite; }
+.stage.tap:focus-visible { outline: 3px solid var(--accent); outline-offset: 6px; }
+.tap-hint { margin: 0; font-family: var(--font-hand); font-size: 26px; font-weight: 700; color: var(--accent); }
+@keyframes nudge { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-6px) scale(1.03); } }
+.sack { width: 100%; height: auto; display: block; transform-origin: 50% 85%; overflow: visible; }
+.sack.shake { animation: shake .9s ease-in-out; }
+@keyframes shake {
+  0%,100% { transform: rotate(0); }
+  15% { transform: rotate(-8deg); } 35% { transform: rotate(7deg) translateY(-4px); }
+  55% { transform: rotate(-5deg); } 75% { transform: rotate(3deg); }
+}
+.sack #peek { transition: transform .6s ease-out, opacity .6s ease-out; }
+.sack .neck-open { opacity: 0; transition: opacity .3s ease; }
+.sack .neck-closed { transition: opacity .3s ease; }
+.sack.open #peek { transform: translateY(-46px); opacity: 0; }
+.sack.open .neck-open { opacity: 1; }
+.sack.open .neck-closed { opacity: 0; }
+
+.cards { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; width: 100%; }
+.cards.pop .card { animation: cardOut .6s cubic-bezier(.2,1.3,.4,1) both; animation-delay: var(--d, 0ms); }
+@keyframes cardOut { from { transform: translateY(-170px) scale(.25) rotate(-12deg); opacity: 0; } to { transform: none; opacity: 1; } }
+.card {
+  appearance: none; border: 2px solid var(--line); background: var(--surface); color: var(--ink);
+  border-radius: 18px; padding: 10px 8px 12px; width: 124px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 4px; font: inherit;
+  transition: transform .15s ease, border-color .15s ease;
+}
+.card:hover { transform: translateY(-3px); border-color: var(--accent); }
+.card:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.card svg { width: 96px; height: 112px; display: block; }
+.card .nm { font-weight: 800; font-size: 15px; line-height: 1.2; min-height: 2.4em; display: flex; align-items: center; }
+.note { min-height: 1.5em; margin: 0; font-weight: 600; color: var(--accent); }
+
+.dance-stage { width: 300px; max-width: 100%; }
+.dance-stage svg { width: 100%; height: auto; display: block; border-radius: 22px; }
+.big { font-family: var(--font-display); font-size: clamp(32px, 9vw, 48px); line-height: 1.05; color: var(--accent); margin: 0; text-wrap: balance; }
+.secret { margin: 0; padding: 10px 16px; border-radius: 12px; background: var(--surface); border: 1px dashed var(--line); color: var(--muted); max-width: 46ch; }
+.link { appearance: none; background: none; border: 0; color: var(--muted); text-decoration: underline; cursor: pointer; font: 600 14px var(--font-body); }
+.link:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.rules { margin: 0; font-size: 13px; color: var(--muted); max-width: 52ch; }
+@keyframes pop { from { transform: scale(.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+/* Hula: hips sway, upper body counter-sways, arms wave to the same side, whole body bobs. */
+.dancer .bob { animation: bob .6s ease-in-out infinite alternate; }
+.dancer .hips { transform-box: view-box; transform-origin: 100px 162px; animation: hips 1.2s ease-in-out infinite alternate; }
+.dancer .upper { transform-box: view-box; transform-origin: 100px 164px; animation: upper 1.2s ease-in-out infinite alternate; }
+.dancer .arm-l { transform-box: view-box; transform-origin: 82px 108px; animation: arm 1.2s ease-in-out infinite alternate; }
+.dancer .arm-r { transform-box: view-box; transform-origin: 118px 108px; animation: arm 1.2s ease-in-out infinite alternate; }
+.dancer .palm { transform-box: view-box; transform-origin: 34px 250px; animation: palm 3s ease-in-out infinite alternate; }
+@keyframes bob { from { transform: translateY(0); } to { transform: translateY(-4px); } }
+@keyframes hips { from { transform: translateX(-8px) rotate(-8deg); } to { transform: translateX(8px) rotate(8deg); } }
+@keyframes upper { from { transform: rotate(3deg); } to { transform: rotate(-3deg); } }
+@keyframes arm { from { transform: rotate(-18deg); } to { transform: rotate(16deg); } }
+@keyframes palm { from { transform: rotate(-2deg); } to { transform: rotate(2deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .sack.shake, .cards.pop .card, h2.pop, .dancer *, .stage.tap { animation: none !important; }
+  .sack #peek, .card { transition: none; }
+}
+</style>
+
+<main class="wrap">
+  <header>
+    <p class="eyebrow">Intercambio de regalos</p>
+    <h1>La Bolsita</h1>
+  </header>
+
+  <section id="v-bag" class="wrap" hidden>
+    <h2 id="bag-title"></h2>
+    <p class="lead" id="bag-msg" hidden></p>
+    <div class="stage" id="stage" role="button" tabindex="0" aria-label="Abrir la bolsita">
+      <svg class="sack" id="sack" viewBox="0 0 260 300" aria-hidden="true">
+        <g id="peek"></g>
+        <path d="M78 104 C58 140 38 190 44 236 C50 280 100 292 130 292 C160 292 210 280 216 236 C222 190 202 140 182 104 Z" fill="var(--sack)"/>
+        <path d="M78 104 C58 140 38 190 44 236 C50 280 100 292 130 292" fill="none" stroke="var(--sack-dark)" stroke-width="3" stroke-dasharray="7 6" opacity=".55"/>
+        <g class="neck-closed">
+          <path d="M70 96 C100 112 160 112 190 96 L184 116 C156 128 104 128 76 116 Z" fill="var(--sack-dark)"/>
+          <path d="M86 112 C70 130 62 150 72 160 M174 112 C190 130 198 150 188 160" fill="none" stroke="var(--string)" stroke-width="5" stroke-linecap="round"/>
+          <circle cx="72" cy="162" r="7" fill="var(--string)"/>
+          <circle cx="188" cy="162" r="7" fill="var(--string)"/>
+        </g>
+        <g class="neck-open">
+          <ellipse cx="130" cy="104" rx="56" ry="15" fill="#4A1913"/>
+          <ellipse cx="130" cy="104" rx="56" ry="15" fill="none" stroke="var(--sack-dark)" stroke-width="5"/>
+          <path d="M76 108 C60 136 58 170 64 196 M184 108 C200 136 202 170 196 196" fill="none" stroke="var(--string)" stroke-width="5" stroke-linecap="round"/>
+          <circle cx="64" cy="198" r="7" fill="var(--string)"/>
+          <circle cx="196" cy="198" r="7" fill="var(--string)"/>
+        </g>
+        <text x="130" y="225" text-anchor="middle" font-family="Caveat, cursive" font-weight="700" font-size="34" fill="#FFF3E6" opacity=".9">regalos</text>
+      </svg>
+    </div>
+    <p class="tap-hint" id="tap-hint" hidden>toca la bolsita</p>
+    <div class="cards" id="cards" hidden></div>
+    <p class="note" id="pick-note" aria-live="polite"></p>
+  </section>
+
+  <section id="v-dance" class="wrap" hidden>
+    <p class="eyebrow" id="dance-for"></p>
+    <div class="dance-stage" id="dance-stage"></div>
+    <p class="big" id="dance-name"></p>
+    <p class="secret">Es secreto: no se lo digas a nadie. Si vuelves a abrir tu enlace, te va a salir la misma persona.</p>
+    <button class="link" id="again" type="button">Volver a abrir la bolsita</button>
+  </section>
+
+  <p class="rules">Cada quien le da un regalo a una sola persona y recibe uno de una sola persona. Nadie se saca a sí misma y ningún nombre sale dos veces.</p>
+</main>
+
+<script>
+"use strict";
+// @@CORE-START
+/** Pure SHA-256 over a Uint8Array; returns a Uint8Array(32). */
+function sha256(msg) {
+  const K = [], H = [];
+  const frac = (x) => ((x - Math.floor(x)) * 4294967296) >>> 0;
+  for (let n = 2, c = 0; c < 64; n++) {
+    let prime = true;
+    for (let d = 2; d * d <= n; d++) { if (n % d === 0) { prime = false; break; } }
+    if (prime) { if (c < 8) H[c] = frac(Math.pow(n, 1 / 2)); K[c] = frac(Math.pow(n, 1 / 3)); c++; }
+  }
+  const len = msg.length;
+  const padLen = ((len + 9 + 63) >> 6) << 6;
+  const m = new Uint8Array(padLen);
+  m.set(msg); m[len] = 0x80;
+  const dv = new DataView(m.buffer);
+  const bits = len * 8;
+  dv.setUint32(padLen - 8, Math.floor(bits / 4294967296));
+  dv.setUint32(padLen - 4, bits >>> 0);
+  const rot = (x, k) => (x >>> k) | (x << (32 - k));
+  const w = new Uint32Array(64);
+  const h = H.slice();
+  for (let o = 0; o < padLen; o += 64) {
+    for (let i = 0; i < 16; i++) w[i] = dv.getUint32(o + i * 4);
+    for (let i = 16; i < 64; i++) {
+      const x = w[i - 15], y = w[i - 2];
+      const s0 = rot(x, 7) ^ rot(x, 18) ^ (x >>> 3);
+      const s1 = rot(y, 17) ^ rot(y, 19) ^ (y >>> 10);
+      w[i] = (w[i - 16] + s0 + w[i - 7] + s1) >>> 0;
+    }
+    let [a, b, c, d, e, f, g, hh] = h;
+    for (let i = 0; i < 64; i++) {
+      const S1 = rot(e, 6) ^ rot(e, 11) ^ rot(e, 25);
+      const ch = (e & f) ^ (~e & g);
+      const t1 = (hh + S1 + ch + K[i] + w[i]) >>> 0;
+      const S0 = rot(a, 2) ^ rot(a, 13) ^ rot(a, 22);
+      const mj = (a & b) ^ (a & c) ^ (b & c);
+      const t2 = (S0 + mj) >>> 0;
+      hh = g; g = f; f = e; e = (d + t1) >>> 0; d = c; c = b; b = a; a = (t1 + t2) >>> 0;
+    }
+    h[0] = (h[0] + a) >>> 0; h[1] = (h[1] + b) >>> 0; h[2] = (h[2] + c) >>> 0; h[3] = (h[3] + d) >>> 0;
+    h[4] = (h[4] + e) >>> 0; h[5] = (h[5] + f) >>> 0; h[6] = (h[6] + g) >>> 0; h[7] = (h[7] + hh) >>> 0;
+  }
+  const out = new Uint8Array(32);
+  const odv = new DataView(out.buffer);
+  for (let i = 0; i < 8; i++) odv.setUint32(i * 4, h[i]);
+  return out;
+}
+
+/** Decrypt one sealed slip with the personal link token; null when the token is wrong. */
+function openSlip(token, hex) {
+  if (typeof hex !== "string" || hex.length % 2) return null;
+  const ks = sha256(new TextEncoder().encode("bolsita-v1|" + token));
+  const bytes = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(hex.substr(i * 2, 2), 16) ^ ks[i % 32];
+  const text = new TextDecoder().decode(bytes);
+  return text.startsWith("OK|") ? text.slice(3).trim() : null;
+}
+// @@CORE-END
+
+/** Sealed slips: giver id -> ciphertext. Readable only with that giver's personal token. */
+const SEALED = {"wendy":"703c8a5393c19d22d87c4637cdd3e253","monicota":"82e28f55d03d6216d6f099ef2c21a4e8","fer":"39e0bc07c6b3369981e0d9fe2f6fa348","miri":"b73ebf2a7bf0a5c631dc74bc4ca44c68","dayo":"cd1867c43af8a45106dd76c3bd5179d8"};
+
+const ORDER = ["wendy", "monicota", "fer", "miri", "dayo"];
+const PEOPLE = {
+  wendy:    { name: "Wendy",            skin: "#E6B88E", hair: "#5B3A25", hair2: null,      style: "wavy",     glasses: false, tall: false, bg: "#FFE3C8", shirt: "#6BB39A" },
+  monicota: { name: "Moni",        skin: "#F7DCC6", hair: "#1A1210", hair2: null,      style: "curly",    glasses: false, tall: true,  bg: "#DDEBFF", shirt: "#E07A8B" },
+  fer:      { name: "Fer la Más Potra", skin: "#C58B5E", hair: "#2A1A12", hair2: null,      style: "straight", glasses: true,  tall: false, bg: "#E5F5D9", shirt: "#7A6BD1" },
+  miri:     { name: "Miri",             skin: "#B57B53", hair: "#2E1710", hair2: "#C8461F", style: "straight", glasses: false, tall: false, bg: "#FFD9CF", shirt: "#E8553A" },
+  dayo:     { name: "Dayo",             skin: "#D3A17B", hair: "#1B100B", hair2: null,      style: "straight", glasses: true,  tall: false, bg: "#F2E3FF", shirt: "#3E9BC9" },
+};
+
+/** Hair drawn behind the head (head coordinates: face centred on x=60, y=cy). */
+function hairBack(p, cy) {
+  if (p.style === "straight") {
+    return `<path d="M33 ${cy} C33 ${cy - 32} 46 ${cy - 38} 60 ${cy - 38} C74 ${cy - 38} 87 ${cy - 32} 87 ${cy} L90 114 C78 121 42 121 30 114 Z" fill="${p.hair}"/>`;
+  }
+  if (p.style === "wavy") {
+    return `<path d="M33 ${cy} C33 ${cy - 32} 46 ${cy - 38} 60 ${cy - 38} C74 ${cy - 38} 87 ${cy - 32} 87 ${cy} C96 ${cy + 10} 83 ${cy + 20} 93 ${cy + 31} C101 ${cy + 42} 86 ${cy + 48} 94 ${cy + 58} C86 ${cy + 65} 78 ${cy + 60} 72 ${cy + 64} C64 ${cy + 60} 56 ${cy + 65} 48 ${cy + 60} C42 ${cy + 65} 34 ${cy + 60} 26 ${cy + 58} C34 ${cy + 48} 19 ${cy + 42} 27 ${cy + 31} C37 ${cy + 20} 24 ${cy + 10} 33 ${cy} Z" fill="${p.hair}"/>`
+      + `<g fill="none" stroke="#FFFFFF" stroke-opacity=".16" stroke-width="2.2" stroke-linecap="round"><path d="M31 ${cy + 8} C37 ${cy + 17} 25 ${cy + 25} 32 ${cy + 34} C39 ${cy + 43} 27 ${cy + 49} 33 ${cy + 56}"/><path d="M89 ${cy + 8} C83 ${cy + 17} 95 ${cy + 25} 88 ${cy + 34} C81 ${cy + 43} 93 ${cy + 49} 87 ${cy + 56}"/></g>`;
+  }
+  let curls = `<ellipse cx="60" cy="${cy + 2}" rx="38" ry="42" fill="${p.hair}"/>`;
+  for (let i = 0; i < 20; i++) {
+    const t = (i / 20) * Math.PI * 2;
+    curls += `<circle cx="${(60 + Math.cos(t) * 39).toFixed(1)}" cy="${(cy + 2 + Math.sin(t) * 43).toFixed(1)}" r="11" fill="${p.hair}"/>`;
+  }
+  [[30, cy + 44], [42, cy + 50], [78, cy + 50], [90, cy + 44]].forEach(([x, y]) => { curls += `<circle cx="${x}" cy="${y}" r="10" fill="${p.hair}"/>`; });
+  return curls;
+}
+
+/** Ears, face, fringe and features (head coordinates). */
+function face(p, cy) {
+  let front = "";
+  if (p.style === "straight") {
+    front = `<path d="M35 ${cy - 3} C34 ${cy - 26} 46 ${cy - 33} 60 ${cy - 33} C76 ${cy - 33} 87 ${cy - 25} 86 ${cy - 3} C80 ${cy - 15} 70 ${cy - 21} 57 ${cy - 22} C49 ${cy - 17} 42 ${cy - 11} 35 ${cy - 3} Z" fill="${p.hair}"/>`;
+  } else if (p.style === "wavy") {
+    front = `<path d="M35 ${cy - 1} C33 ${cy - 26} 46 ${cy - 33} 60 ${cy - 33} C76 ${cy - 33} 88 ${cy - 25} 86 ${cy - 1} C84 ${cy - 9} 80 ${cy - 13} 75 ${cy - 12} C72 ${cy - 19} 66 ${cy - 19} 63 ${cy - 15} C59 ${cy - 21} 52 ${cy - 21} 49 ${cy - 15} C45 ${cy - 19} 38 ${cy - 14} 35 ${cy - 1} Z" fill="${p.hair}"/>`;
+  } else {
+    [[38, cy - 18], [46, cy - 26], [55, cy - 30], [65, cy - 30], [74, cy - 26], [82, cy - 18]].forEach(([x, y]) => {
+      front += `<circle cx="${x}" cy="${y}" r="8.5" fill="${p.hair}"/><circle cx="${x - 2}" cy="${y - 2}" r="3" fill="#FFFFFF" opacity=".12"/>`;
+    });
+  }
+  const streak = p.hair2
+    ? `<path d="M76 ${cy - 30} C84 ${cy - 22} 86 ${cy - 10} 86 ${cy - 2}" stroke="${p.hair2}" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M88 ${cy + 8} C90 ${cy + 28} 88 ${cy + 40} 90 ${cy + 52}" stroke="${p.hair2}" stroke-width="3" fill="none" stroke-linecap="round" opacity=".8"/>`
+    : "";
+  const glasses = p.glasses
+    ? `<g fill="none" stroke="#2B2233" stroke-width="2.4"><circle cx="50" cy="${cy + 2}" r="8.5"/><circle cx="70" cy="${cy + 2}" r="8.5"/><path d="M58.5 ${cy + 1} Q60 ${cy - 1} 61.5 ${cy + 1}"/><path d="M41.5 ${cy} L36 ${cy - 2}"/><path d="M78.5 ${cy} L84 ${cy - 2}"/></g>`
+    : "";
+  return `<ellipse cx="34" cy="${cy + 4}" rx="4" ry="6" fill="${p.skin}"/><ellipse cx="86" cy="${cy + 4}" rx="4" ry="6" fill="${p.skin}"/>
+    <ellipse cx="60" cy="${cy}" rx="25" ry="29" fill="${p.skin}"/>
+    ${front}${streak}
+    <path d="M45 ${cy - 7} Q50 ${cy - 10} 55 ${cy - 7} M65 ${cy - 7} Q70 ${cy - 10} 75 ${cy - 7}" stroke="#2B2233" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <circle cx="50" cy="${cy + 2}" r="3" fill="#2B2233"/><circle cx="70" cy="${cy + 2}" r="3" fill="#2B2233"/>
+    ${glasses}
+    <circle cx="43" cy="${cy + 13}" r="4.5" fill="#F07C86" opacity=".35"/><circle cx="77" cy="${cy + 13}" r="4.5" fill="#F07C86" opacity=".35"/>
+    <path d="M52 ${cy + 15} Q60 ${cy + 22} 68 ${cy + 15}" stroke="#7A2E3A" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
+}
+
+/** Bust portrait for the cards. */
+function avatar(id) {
+  const p = PEOPLE[id];
+  const up = p.tall ? -7 : 0;
+  const cy = 60 + up;
+  return `<svg viewBox="0 0 120 140" role="img" aria-label="${p.name}">
+    <rect x="4" y="4" width="112" height="132" rx="22" fill="${p.bg}"/>
+    ${hairBack(p, cy)}
+    <rect x="52" y="${cy + 22}" width="16" height="${26 - up}" rx="6" fill="${p.skin}"/>
+    <path d="M18 140 C18 ${112 - up / 2} 38 98 60 98 C82 98 102 ${112 - up / 2} 102 140 Z" fill="${p.shirt}"/>
+    ${face(p, cy)}
+  </svg>`;
+}
+
+/** Full-body hula dancer on a small beach stage (viewBox 200 x 300, body centred on x=100). */
+function dancer(id) {
+  const p = PEOPLE[id];
+  const up = p.tall ? -7 : 0;
+  const cy = 60 + up;
+  const head = (inner) => `<g transform="translate(40 4)">${inner}</g>`;
+  const LEI = ["#FF5A7A", "#FFD23F", "#FFFFFF", "#FF8FB1"];
+  let lei = "";
+  for (let i = 0; i <= 8; i++) {
+    const a = (i / 8) * Math.PI;
+    lei += `<circle cx="${(100 + Math.cos(a) * 19).toFixed(1)}" cy="${(102 + Math.sin(a) * 11).toFixed(1)}" r="4.6" fill="${LEI[i % 4]}"/>`;
+  }
+  const GRASS = ["#3FA34D", "#2E8B57", "#7CC36E"];
+  let skirt = "";
+  for (let i = 0; i <= 16; i++) {
+    const x0 = 83 + i * 2.125;
+    const x1 = 100 + (x0 - 100) * 1.7;
+    const y1 = 222 + (i % 2) * 6;
+    skirt += `<path d="M${x0.toFixed(1)} 163 Q${((x0 + x1) / 2 + (i % 3 - 1) * 2).toFixed(1)} 195 ${x1.toFixed(1)} ${y1}" stroke="${GRASS[i % 3]}" stroke-width="4.5" fill="none" stroke-linecap="round"/>`;
+  }
+  let flower = "";
+  for (let k = 0; k < 5; k++) {
+    const a = (k / 5) * Math.PI * 2;
+    flower += `<circle cx="${(84 + Math.cos(a) * 5).toFixed(1)}" cy="${(cy - 26 + Math.sin(a) * 5).toFixed(1)}" r="5" fill="#FF4F6E"/>`;
+  }
+  flower += `<circle cx="84" cy="${cy - 26}" r="2.6" fill="#FFD23F"/>`;
+  return `<svg class="dancer" viewBox="0 0 200 300" role="img" aria-label="${p.name} bailando hula">
+    <rect width="200" height="300" fill="#BDE7F2"/>
+    <circle cx="160" cy="42" r="20" fill="#FFD23F"/>
+    <rect y="232" width="200" height="22" fill="#5EC3D9"/>
+    <path d="M0 250 C50 244 150 246 200 250 L200 300 L0 300 Z" fill="#F2D49B"/>
+    <g class="palm">
+      <path d="M30 252 C28 210 34 170 44 132" stroke="#8A5A33" stroke-width="7" fill="none" stroke-linecap="round"/>
+      <path d="M44 132 C30 118 14 122 4 132 M44 132 C40 112 26 104 12 104 M44 132 C52 112 66 108 78 112 M44 132 C60 124 72 132 80 144 M44 132 C34 136 24 148 22 160" stroke="#2E8B57" stroke-width="6" fill="none" stroke-linecap="round"/>
+    </g>
+    <ellipse cx="100" cy="274" rx="34" ry="6" fill="#000000" opacity=".12"/>
+    <g class="bob">
+      <g class="legs">
+        <rect x="88" y="208" width="9" height="62" rx="4.5" fill="${p.skin}"/>
+        <rect x="103" y="208" width="9" height="62" rx="4.5" fill="${p.skin}"/>
+        <ellipse cx="91" cy="271" rx="8" ry="4" fill="${p.skin}"/>
+        <ellipse cx="109" cy="271" rx="8" ry="4" fill="${p.skin}"/>
+      </g>
+      <g class="upper">
+        ${head(hairBack(p, cy))}
+        <rect x="92" y="${cy + 26}" width="16" height="${100 - cy - 18}" rx="6" fill="${p.skin}"/>
+        <path d="M80 106 C80 101 120 101 120 106 L118 132 C116 146 114 156 116 166 L84 166 C86 156 84 146 82 132 Z" fill="${p.skin}"/>
+        <path d="M80 106 C80 101 120 101 120 106 L119 127 C110 132 90 132 81 127 Z" fill="${p.shirt}"/>
+        ${lei}
+        <g class="arm-l"><path d="M82 108 C66 113 56 105 48 92" stroke="${p.skin}" stroke-width="9" fill="none" stroke-linecap="round"/><circle cx="47" cy="90" r="5.5" fill="${p.skin}"/></g>
+        <g class="arm-r"><path d="M118 108 C134 113 144 105 152 92" stroke="${p.skin}" stroke-width="9" fill="none" stroke-linecap="round"/><circle cx="153" cy="90" r="5.5" fill="${p.skin}"/></g>
+        ${head(face(p, cy) + flower)}
+      </g>
+      <g class="hips">
+        ${skirt}
+        <rect x="81" y="157" width="38" height="8" rx="4" fill="#FFD23F"/>
+        <circle cx="88" cy="161" r="3.6" fill="#FF5A7A"/><circle cx="100" cy="161" r="3.6" fill="#FFFFFF"/><circle cx="112" cy="161" r="3.6" fill="#FF5A7A"/>
+      </g>
+    </g>
+  </svg>`;
+}
+
+/** Five mini cards peeking out of the closed bag. */
+function peekCards() {
+  return ORDER.map((id, i) => {
+    const p = PEOPLE[id];
+    const x = 82 + i * 20, rot = [-16, -7, 2, 10, 18][i], y = 58 + [6, 0, -4, 0, 6][i];
+    return `<g transform="rotate(${rot} ${x + 13} ${y + 22})"><rect x="${x}" y="${y}" width="26" height="40" rx="4" fill="${p.bg}" stroke="#FFFFFF" stroke-width="1.5"/>`
+      + `<circle cx="${x + 13}" cy="${y + 13}" r="8" fill="${p.hair}"/><circle cx="${x + 13}" cy="${y + 15}" r="6" fill="${p.skin}"/></g>`;
+  }).join("");
+}
+
+const $ = (id) => document.getElementById(id);
+const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+let me = null, receiver = null, timers = [];
+
+function show(view) { ["v-bag", "v-dance"].forEach((v) => { $(v).hidden = v !== view; }); window.scrollTo(0, 0); }
+function later(fn, ms) { timers.push(setTimeout(fn, reduceMotion ? 0 : ms)); }
+function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+function setTitle(text) { const t = $("bag-title"); t.classList.remove("pop"); void t.offsetWidth; t.textContent = text; t.classList.add("pop"); }
+
+function renderCards() {
+  const box = $("cards");
+  box.textContent = "";
+  ORDER.forEach((id, i) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "card"; b.style.setProperty("--d", (i * 140) + "ms");
+    b.innerHTML = avatar(id);
+    const nm = document.createElement("span"); nm.className = "nm"; nm.textContent = PEOPLE[id].name;
+    b.appendChild(nm);
+    b.addEventListener("click", () => pick(id));
+    box.appendChild(b);
+  });
+}
+
+function pick(id) {
+  if (!me) {
+    $("pick-note").textContent = "Para ver a quién le das tu regalo, abre el enlace personal que te mandaron.";
+    return;
+  }
+  if (id !== me) {
+    $("pick-note").textContent = "Este enlace es personal y no es de " + PEOPLE[id].name + ". Toca tu propio personaje.";
+    return;
+  }
+  clearTimers();
+  $("dance-for").textContent = PEOPLE[me].name + ", te tocó darle tu regalo a";
+  $("dance-stage").innerHTML = dancer(receiver);
+  $("dance-name").textContent = PEOPLE[receiver].name;
+  show("v-dance");
+}
+
+function resetBag() {
+  const sack = $("sack");
+  sack.classList.remove("open", "shake");
+  $("peek").innerHTML = peekCards();
+  $("cards").hidden = true;
+  $("cards").classList.remove("pop");
+  $("pick-note").textContent = "";
+  $("bag-msg").hidden = true;
+}
+
+let opened = false;
+
+/** Closed bag waiting for a tap; the cards stay inside until then. */
+function prepareBag() {
+  clearTimers();
+  resetBag();
+  renderCards();
+  opened = false;
+  $("stage").classList.add("tap");
+  $("stage").setAttribute("tabindex", "0");
+  $("tap-hint").hidden = false;
+  $("bag-title").textContent = "Aquí están todas en la bolsita";
+  show("v-bag");
+}
+
+/** Tap: the bag shakes, opens, the cards fly out, then she picks herself. */
+function openBag() {
+  if (opened) return;
+  opened = true;
+  const stage = $("stage"), sack = $("sack");
+  stage.classList.remove("tap");
+  stage.removeAttribute("tabindex");
+  $("tap-hint").hidden = true;
+  $("bag-msg").hidden = true;
+  $("bag-title").textContent = "Abriendo la bolsita...";
+  void sack.getBoundingClientRect();
+  sack.classList.add("shake");
+  later(() => { sack.classList.add("open"); }, 900);
+  later(() => { $("cards").hidden = false; $("cards").classList.add("pop"); }, 1150);
+  later(() => { setTitle("Selecciona quién eres"); }, 1950);
+}
+
+function boot() {
+  clearTimers();
+  me = null; receiver = null;
+  const token = decodeURIComponent((location.hash || "").slice(1)).trim();
+  const giver = token.split("-")[0];
+  if (token && SEALED && PEOPLE[giver] && SEALED[giver]) {
+    const r = openSlip(token, SEALED[giver]);
+    if (r && PEOPLE[r] && r !== giver) { me = giver; receiver = r; }
+  }
+  prepareBag();
+  if (!me && token) {
+    $("bag-msg").innerHTML = "Este enlace no está completo. Vuelve a copiar <strong>todo</strong> el enlace que te mandaron, incluida la parte después del #.";
+    $("bag-msg").hidden = false;
+  }
+}
+
+$("stage").addEventListener("click", openBag);
+$("stage").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openBag(); } });
+$("again").addEventListener("click", prepareBag);
+window.addEventListener("hashchange", boot);
+boot();
+</script>
+
+</body>
+</html>
